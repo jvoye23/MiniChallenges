@@ -1,4 +1,0 @@
-package com.jvcodingsolutions.minichallenges.april_2026.adaptive_design_tokens
-
-class test {
-}
