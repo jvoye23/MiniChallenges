@@ -25,4 +25,6 @@ val HostGrotesk = FontFamily(
     Font(R.font.host_grotesk_extra_bold_italic, FontWeight.ExtraBold, FontStyle.Italic)
 )
 
-val AdaptiveDesignTokensTypography = Typography()
+val AzeretMono = FontFamily(
+    Font(R.font.azeret_mono_light, FontWeight.Light)
+)
