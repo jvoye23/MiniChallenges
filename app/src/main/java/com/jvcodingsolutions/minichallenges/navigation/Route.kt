@@ -8,3 +8,6 @@ data object AdaptiveDesignRoute : NavKey
 
 @Serializable
 data object ReadyToTypeRoute : NavKey
+
+@Serializable
+data object EditingStatusRoute : NavKey
