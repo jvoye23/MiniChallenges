@@ -23,6 +23,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,9 +51,20 @@ fun CloudPhotoBackupScreenRoot(
     viewModel: CloudPhotoBackupViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val workInfos by viewModel.workInfoFlow.collectAsStateWithLifecycle(initialValue = emptyList())
+
+    LaunchedEffect(workInfos) {
+        viewModel.observeWorkInfo(workInfos)
+    }
 
     CloudPhotoBackupStateScreen(
-        onBackupButtonClick = viewModel::startBackup,
+        onBackupButtonClick = {
+            if (state.uploadStatus == UploadStatus.Finished) {
+                viewModel.resetBackup()
+            } else {
+                viewModel.startBackup()
+            }
+        },
         state = state
     )
 }
@@ -116,14 +128,13 @@ private fun CloudPhotoBackupStateScreen(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             onClick = onBackupButtonClick,
-            enabled = state.uploadStatus.name == "NotStarted" ,
+            enabled = state.uploadStatus == UploadStatus.NotStarted || state.uploadStatus == UploadStatus.Finished,
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.cloudPhotoBackupPrimary,
-                disabledContainerColor = when(state.uploadStatus) {
-                    UploadStatus.NotStarted -> MaterialTheme.colorScheme.cloudPhotoBackupSurfaceHigher
-                    UploadStatus.Started, UploadStatus.Paused -> MaterialTheme.colorScheme.cloudPhotoBackupSurfaceHigher
+                containerColor = when(state.uploadStatus) {
                     UploadStatus.Finished -> MaterialTheme.colorScheme.cloudPhotoBackupSuccess
-                }
+                    else -> MaterialTheme.colorScheme.cloudPhotoBackupPrimary
+                },
+                disabledContainerColor = MaterialTheme.colorScheme.cloudPhotoBackupSurfaceHigher,
             )
         ) {
             Row(
