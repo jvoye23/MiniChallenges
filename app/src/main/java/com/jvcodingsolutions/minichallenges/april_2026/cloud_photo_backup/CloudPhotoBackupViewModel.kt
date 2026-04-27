@@ -90,6 +90,10 @@ class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(app
                 }
             }
 
+            WorkInfo.State.CANCELLED -> {
+                _state.update { CloudPhotoBackupState() }
+            }
+
             else -> {}
         }
     }
@@ -125,6 +129,7 @@ class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(app
 
     fun resetBackup() {
         workManager.cancelUniqueWork(PhotoBackupWorker.WORK_NAME)
+        workManager.pruneWork()
         prefs.edit().putInt(PhotoBackupWorker.KEY_UPLOADED_COUNT, 0).apply()
         _state.update { CloudPhotoBackupState() }
     }
