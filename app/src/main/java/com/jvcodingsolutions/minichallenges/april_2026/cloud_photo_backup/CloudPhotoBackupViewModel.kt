@@ -13,7 +13,6 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,22 +39,13 @@ class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(app
         when (workInfo.state) {
             WorkInfo.State.ENQUEUED -> {
                 val uploaded = prefs.getInt(PhotoBackupWorker.KEY_UPLOADED_COUNT, 0)
-                if (uploaded > 0) {
-                    _state.update {
-                        it.copy(
-                            uploadStatus = UploadStatus.Paused,
-                            uploadedItems = uploaded,
-                            uploadProgress = uploaded.toFloat() / it.totalItems,
-                            buttonState = CloudPhotoBackupButtonState.Disabled,
-                        )
-                    }
-                } else {
-                    _state.update {
-                        it.copy(
-                            uploadStatus = UploadStatus.Paused,
-                            buttonState = CloudPhotoBackupButtonState.Disabled,
-                        )
-                    }
+                _state.update {
+                    it.copy(
+                        uploadStatus = UploadStatus.Paused,
+                        uploadedItems = uploaded,
+                        uploadProgress = uploaded.toFloat() / it.totalItems,
+                        buttonState = CloudPhotoBackupButtonState.Disabled,
+                    )
                 }
             }
 
@@ -65,9 +55,11 @@ class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(app
                 val total = progress.getInt(
                     PhotoBackupWorker.KEY_TOTAL_PHOTOS, PhotoBackupWorker.TOTAL_PHOTOS
                 )
+                val isPaused = progress.getBoolean(PhotoBackupWorker.KEY_IS_PAUSED, false)
+
                 _state.update {
                     it.copy(
-                        uploadStatus = UploadStatus.Started,
+                        uploadStatus = if (isPaused) UploadStatus.Paused else UploadStatus.Started,
                         uploadedItems = uploaded,
                         uploadProgress = if (total > 0) uploaded.toFloat() / total else 0f,
                         buttonState = CloudPhotoBackupButtonState.Disabled,
@@ -103,12 +95,7 @@ class CloudPhotoBackupViewModel(application: Application) : AndroidViewModel(app
 
         prefs.edit().putInt(PhotoBackupWorker.KEY_UPLOADED_COUNT, 0).apply()
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
         val workRequest = OneTimeWorkRequestBuilder<PhotoBackupWorker>()
-            .setConstraints(constraints)
             .build()
 
         workManager.enqueueUniqueWork(
