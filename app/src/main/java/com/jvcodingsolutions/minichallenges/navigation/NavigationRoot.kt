@@ -2,6 +2,7 @@ package com.jvcodingsolutions.minichallenges.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Menu
@@ -30,6 +31,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.jvcodingsolutions.minichallenges.april_2026.adaptive_design_tokens.presentation.screens.AdaptiveDesignScreen
+import com.jvcodingsolutions.minichallenges.april_2026.cloud_photo_backup.CloudPhotoBackupScreenRoot
 import com.jvcodingsolutions.minichallenges.april_2026.editing_status.EditingStatusScreenRoot
 import com.jvcodingsolutions.minichallenges.april_2026.ready_to_type.ReadyToTypeScreenRoot
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationRoot() {
-    val backStack = rememberNavBackStack(EditingStatusRoute)
+    val backStack = rememberNavBackStack(CloudPhotoBackupRoute)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -48,6 +50,7 @@ fun NavigationRoot() {
             DrawerItem("Adaptive Design Tokens", Icons.Default.Palette, AdaptiveDesignRoute),
             DrawerItem("Ready To Type", Icons.Default.Keyboard, ReadyToTypeRoute),
             DrawerItem("Editing Status", Icons.Default.Edit, EditingStatusRoute),
+            DrawerItem("Cloud Photo Backup", Icons.Default.CloudSync, CloudPhotoBackupRoute),
         )
     }
 
@@ -55,6 +58,7 @@ fun NavigationRoot() {
         is AdaptiveDesignRoute -> "Adaptive Design Tokens"
         is ReadyToTypeRoute -> "Ready To Type"
         is EditingStatusRoute -> "Editing Status"
+        is CloudPhotoBackupRoute -> "Cloud Photo Backup"
         else -> "Mini Challenges April 2026"
     }
 
@@ -110,7 +114,11 @@ fun NavigationRoot() {
                     entry<EditingStatusRoute> {
                         EditingStatusScreenRoot()
                     }
+                    entry<CloudPhotoBackupRoute> {
+                        CloudPhotoBackupScreenRoot()
+                    }
                 },
+
             )
         }
     }

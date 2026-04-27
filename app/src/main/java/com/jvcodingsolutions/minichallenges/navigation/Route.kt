@@ -11,3 +11,6 @@ data object ReadyToTypeRoute : NavKey
 
 @Serializable
 data object EditingStatusRoute : NavKey
+
+@Serializable
+data object CloudPhotoBackupRoute: NavKey
