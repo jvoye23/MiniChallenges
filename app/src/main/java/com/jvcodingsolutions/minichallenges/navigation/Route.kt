@@ -14,3 +14,6 @@ data object EditingStatusRoute : NavKey
 
 @Serializable
 data object CloudPhotoBackupRoute: NavKey
+
+@Serializable
+data object GuidedFeatureTourRoute: NavKey
